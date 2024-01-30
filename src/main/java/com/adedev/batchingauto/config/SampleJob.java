@@ -19,6 +19,7 @@ import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.item.json.JacksonJsonObjectReader;
 import org.springframework.batch.item.json.JsonItemReader;
 import org.springframework.batch.item.xml.StaxEventItemReader;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,16 +37,17 @@ public class SampleJob {
     private final FirstJobReader jobReader;
     private final FirstJobProcessor jobProcessor;
     private final FirstJobWriter jobWriter;
-    private final DataSource dataSource;
+    @Qualifier("universityDataSource")
+    private final DataSource universityDataSource;
 
     public SampleJob(JobRepository jobRepository, PlatformTransactionManager transactionManager,
-                     FirstJobReader jobReader, FirstJobProcessor jobProcessor, FirstJobWriter jobWriter, DataSource dataSource) {
+                     FirstJobReader jobReader, FirstJobProcessor jobProcessor, FirstJobWriter jobWriter, DataSource universityDataSource) {
         this.jobRepository = jobRepository;
         this.transactionManager = transactionManager;
         this.jobReader = jobReader;
         this.jobProcessor = jobProcessor;
         this.jobWriter = jobWriter;
-        this.dataSource = dataSource;
+        this.universityDataSource = universityDataSource;
     }
 
     @Bean
@@ -122,16 +124,16 @@ public class SampleJob {
 
     public JdbcCursorItemReader<StudentJDBC> jdbcJdbcCursorItemReader() {
         JdbcCursorItemReader<StudentJDBC> jdbcJdbcCursorItemReader = new JdbcCursorItemReader<>();
-        jdbcJdbcCursorItemReader.setDataSource(dataSource);
+        jdbcJdbcCursorItemReader.setDataSource(universityDataSource);
         jdbcJdbcCursorItemReader.setSql(
-                "SELECT id, first_name, last_name, email FROM student");
+                "SELECT id, first_name, last_name, email FROM university.student");
 
         BeanPropertyRowMapper<StudentJDBC> beanPropertyRowMapper = new BeanPropertyRowMapper<>();
         beanPropertyRowMapper.setMappedClass(StudentJDBC.class);
         jdbcJdbcCursorItemReader.setRowMapper(beanPropertyRowMapper);
 
         jdbcJdbcCursorItemReader.setCurrentItemCount(2);
-        jdbcJdbcCursorItemReader.setMaxItemCount(8);
+//        jdbcJdbcCursorItemReader.setMaxItemCount(8);
 
         return jdbcJdbcCursorItemReader;
     }
