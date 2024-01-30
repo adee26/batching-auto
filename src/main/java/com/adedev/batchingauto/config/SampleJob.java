@@ -14,6 +14,7 @@ import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.adapter.ItemReaderAdapter;
+import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.FlatFileItemWriter;
@@ -49,13 +50,15 @@ public class SampleJob {
     private final FlatFileItemWriter<StudentJDBC> flatFileItemWriter;
     private final JsonFileItemWriter<StudentJSON> jsonFileItemWriter;
     private final StaxEventItemWriter<StudentJDBC> staxEventItemWriter;
+    private final JdbcBatchItemWriter<StudentCSV> jdbcBatchItemWriter;
 
     public SampleJob(JobRepository jobRepository, PlatformTransactionManager transactionManager,
                      FirstJobReader jobReader, FirstJobProcessor jobProcessor, FirstJobWriter jobWriter,
                      StudentService studentService, DataSource universityDataSource,
                      FlatFileItemWriter<StudentJDBC> flatFileItemWriter,
                      JsonFileItemWriter<StudentJSON> jsonFileItemWriter,
-                     StaxEventItemWriter<StudentJDBC> staxEventItemWriter) {
+                     StaxEventItemWriter<StudentJDBC> staxEventItemWriter,
+                     JdbcBatchItemWriter<StudentCSV> jdbcBatchItemWriter) {
         this.jobRepository = jobRepository;
         this.transactionManager = transactionManager;
         this.jobReader = jobReader;
@@ -66,6 +69,7 @@ public class SampleJob {
         this.flatFileItemWriter = flatFileItemWriter;
         this.jsonFileItemWriter = jsonFileItemWriter;
         this.staxEventItemWriter = staxEventItemWriter;
+        this.jdbcBatchItemWriter = jdbcBatchItemWriter;
     }
 
     @Bean
@@ -78,14 +82,14 @@ public class SampleJob {
 
     public Step firstChunkStep() {
         return new StepBuilder("First Chunk Step", jobRepository)
-                .<StudentJDBC, StudentJDBC> chunk(3, transactionManager)
-//                .reader(flatFileItemReader(null))
+                .<StudentCSV, StudentCSV> chunk(3, transactionManager)
+                .reader(flatFileItemReader(null))
 //                .reader(jsonItemReader(null))
 //                .reader(staxEventItemReader(null))
-                .reader(jdbcJdbcCursorItemReader())
+//                .reader(jdbcJdbcCursorItemReader())
 //                .reader(itemReaderAdapter())
 //                .processor(jobProcessor)
-                .writer(staxEventItemWriter)
+                .writer(jdbcBatchItemWriter)
 //                .writer(jobWriter)
                 .build();
 
