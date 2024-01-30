@@ -81,8 +81,13 @@ public class ItemWriterConfig {
         JdbcBatchItemWriter<StudentCSV> jdbcBatchItemWriter = new JdbcBatchItemWriter<>();
         jdbcBatchItemWriter.setDataSource(universityDataSource);
         jdbcBatchItemWriter.setSql("INSERT INTO university.student(id, first_name, last_name, email) " +
-                "VALUES (:id, :firstName, :lastName, :email)");
-        jdbcBatchItemWriter.setItemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>());
+                "VALUES (?,?,?,?)");
+        jdbcBatchItemWriter.setItemPreparedStatementSetter(
+                ((item, ps) -> { ps.setLong(1, item.getId());
+                ps.setString(2, item.getFirstName());
+                ps.setString(3, item.getLastName());
+                ps.setString(4, item.getEmail());})
+        );
         return jdbcBatchItemWriter;
     }
 }
