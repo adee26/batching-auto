@@ -3,8 +3,10 @@ package com.adedev.batchingauto.config;
 import com.adedev.batchingauto.model.StudentCSV;
 import com.adedev.batchingauto.model.StudentJDBC;
 import com.adedev.batchingauto.model.StudentJSON;
+import com.adedev.batchingauto.model.StudentResponse;
+import com.adedev.batchingauto.service.StudentService;
 import org.springframework.batch.core.configuration.annotation.StepScope;
-import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
+import org.springframework.batch.item.adapter.ItemWriterAdapter;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor;
@@ -26,9 +28,11 @@ import java.util.Date;
 public class ItemWriterConfig {
     @Qualifier("universityDataSource")
     private final DataSource universityDataSource;
+    private final StudentService studentService;
 
-    public ItemWriterConfig(DataSource universityDataSource) {
+    public ItemWriterConfig(DataSource universityDataSource, StudentService studentService) {
         this.universityDataSource = universityDataSource;
+        this.studentService = studentService;
     }
 
     @Bean
@@ -89,5 +93,15 @@ public class ItemWriterConfig {
                 ps.setString(4, item.getEmail());})
         );
         return jdbcBatchItemWriter;
+    }
+    @Bean
+
+    public ItemWriterAdapter<StudentCSV> itemWriterAdapter() {
+        ItemWriterAdapter<StudentCSV> itemWriterAdapter = new ItemWriterAdapter<>();
+
+        itemWriterAdapter.setTargetObject(studentService);
+        itemWriterAdapter.setTargetMethod("restCallToCreateStudent");
+
+        return itemWriterAdapter;
     }
 }

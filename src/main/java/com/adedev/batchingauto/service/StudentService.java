@@ -1,5 +1,6 @@
 package com.adedev.batchingauto.service;
 
+import com.adedev.batchingauto.model.StudentCSV;
 import com.adedev.batchingauto.model.StudentResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -25,6 +26,13 @@ public class StudentService {
         }
 
         return list;
+    }
+
+    public StudentResponse restCallToCreateStudent(StudentCSV studentCSV) {
+        RestTemplate restTemplate = new RestTemplate();
+        return  restTemplate.postForObject("http://localhost:8081/api/v1/students",
+                studentCSV,
+                StudentResponse.class);
     }
 
     public StudentResponse getStudent(long id, String name) {

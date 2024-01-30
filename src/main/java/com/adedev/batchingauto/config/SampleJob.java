@@ -14,6 +14,7 @@ import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.adapter.ItemReaderAdapter;
+import org.springframework.batch.item.adapter.ItemWriterAdapter;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.file.FlatFileItemReader;
@@ -51,6 +52,7 @@ public class SampleJob {
     private final JsonFileItemWriter<StudentJSON> jsonFileItemWriter;
     private final StaxEventItemWriter<StudentJDBC> staxEventItemWriter;
     private final JdbcBatchItemWriter<StudentCSV> jdbcBatchItemWriter;
+    private final ItemWriterAdapter<StudentCSV> itemWriterAdapter;
 
     public SampleJob(JobRepository jobRepository, PlatformTransactionManager transactionManager,
                      FirstJobReader jobReader, FirstJobProcessor jobProcessor, FirstJobWriter jobWriter,
@@ -58,7 +60,7 @@ public class SampleJob {
                      FlatFileItemWriter<StudentJDBC> flatFileItemWriter,
                      JsonFileItemWriter<StudentJSON> jsonFileItemWriter,
                      StaxEventItemWriter<StudentJDBC> staxEventItemWriter,
-                     JdbcBatchItemWriter<StudentCSV> jdbcBatchItemWriter) {
+                     JdbcBatchItemWriter<StudentCSV> jdbcBatchItemWriter, ItemWriterAdapter<StudentCSV> itemWriterAdapter) {
         this.jobRepository = jobRepository;
         this.transactionManager = transactionManager;
         this.jobReader = jobReader;
@@ -70,6 +72,7 @@ public class SampleJob {
         this.jsonFileItemWriter = jsonFileItemWriter;
         this.staxEventItemWriter = staxEventItemWriter;
         this.jdbcBatchItemWriter = jdbcBatchItemWriter;
+        this.itemWriterAdapter = itemWriterAdapter;
     }
 
     @Bean
@@ -89,7 +92,7 @@ public class SampleJob {
 //                .reader(jdbcJdbcCursorItemReader())
 //                .reader(itemReaderAdapter())
 //                .processor(jobProcessor)
-                .writer(jdbcBatchItemWriter)
+                .writer(itemWriterAdapter)
 //                .writer(jobWriter)
                 .build();
 
