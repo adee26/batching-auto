@@ -1,6 +1,7 @@
 package com.adedev.batchingauto.config;
 
 import com.adedev.batchingauto.model.StudentCSV;
+import com.adedev.batchingauto.model.StudentJSON;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -12,6 +13,8 @@ import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
+import org.springframework.batch.item.json.JacksonJsonObjectReader;
+import org.springframework.batch.item.json.JsonItemReader;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,8 +50,9 @@ public class SampleJob {
 
     public Step firstChunkStep() {
         return new StepBuilder("First Chunk Step", jobRepository)
-                .<StudentCSV, StudentCSV> chunk(3, transactionManager)
-                .reader(flatFileItemReader(null))
+                .<StudentJSON, StudentJSON> chunk(3, transactionManager)
+//                .reader(flatFileItemReader(null))
+                .reader(jsonItemReader(null))
 //                .processor(jobProcessor)
                 .writer(jobWriter)
                 .build();
@@ -78,4 +82,17 @@ public class SampleJob {
 
         return flatFileItemReader;
     }
+
+    @Bean
+    @StepScope
+    public JsonItemReader<StudentJSON> jsonItemReader(
+            @Value("#{jobParameters['inputFile']}") FileSystemResource fileSystemResource) {
+        JsonItemReader<StudentJSON> jsonItemReader = new JsonItemReader<>();
+        jsonItemReader.setResource(fileSystemResource);
+        jsonItemReader.setJsonObjectReader(new JacksonJsonObjectReader<>(StudentJSON.class));
+        jsonItemReader.setCurrentItemCount(2);
+        jsonItemReader.setMaxItemCount(8);
+        return jsonItemReader;
+    }
+
 }
