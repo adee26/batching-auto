@@ -46,10 +46,12 @@ public class SampleJob {
     @Qualifier("universityDataSource")
     private final DataSource universityDataSource;
     private final FlatFileItemWriter<StudentJDBC> flatFileItemWriter;
-    private final JsonFileItemWriter<StudentJDBC> jsonFileItemWriter;
+    private final JsonFileItemWriter<StudentJSON> jsonFileItemWriter;
 
     public SampleJob(JobRepository jobRepository, PlatformTransactionManager transactionManager,
-                     FirstJobReader jobReader, FirstJobProcessor jobProcessor, FirstJobWriter jobWriter, StudentService studentService, DataSource universityDataSource, FlatFileItemWriter<StudentJDBC> flatFileItemWriter, JsonFileItemWriter<StudentJDBC> jsonFileItemWriter) {
+                     FirstJobReader jobReader, FirstJobProcessor jobProcessor, FirstJobWriter jobWriter,
+                     StudentService studentService, DataSource universityDataSource,
+                     FlatFileItemWriter<StudentJDBC> flatFileItemWriter, JsonFileItemWriter<StudentJSON> jsonFileItemWriter) {
         this.jobRepository = jobRepository;
         this.transactionManager = transactionManager;
         this.jobReader = jobReader;
@@ -71,13 +73,13 @@ public class SampleJob {
 
     public Step firstChunkStep() {
         return new StepBuilder("First Chunk Step", jobRepository)
-                .<StudentJDBC, StudentJDBC> chunk(3, transactionManager)
+                .<StudentJDBC, StudentJSON> chunk(3, transactionManager)
 //                .reader(flatFileItemReader(null))
 //                .reader(jsonItemReader(null))
 //                .reader(staxEventItemReader(null))
                 .reader(jdbcJdbcCursorItemReader())
 //                .reader(itemReaderAdapter())
-//                .processor(jobProcessor)
+                .processor(jobProcessor)
                 .writer(jsonFileItemWriter)
 //                .writer(jobWriter)
                 .build();

@@ -1,13 +1,22 @@
 package com.adedev.batchingauto.config;
 
+import com.adedev.batchingauto.model.StudentJDBC;
+import com.adedev.batchingauto.model.StudentJSON;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.stereotype.Component;
 
 @Component
-public class FirstJobProcessor implements ItemProcessor<Integer, Long> {
+public class FirstJobProcessor implements ItemProcessor<StudentJDBC, StudentJSON> {
     @Override
-    public Long process(Integer item) throws Exception {
+    public StudentJSON process(StudentJDBC item) {
         System.out.println("Inside Item Processor");
-        return (long) (item + 20);
+
+        StudentJSON studentJSON = new StudentJSON();
+        studentJSON.setId(item.getId());
+        studentJSON.setFirstName(item.getFirstName());
+        studentJSON.setLastName(item.getLastName());
+        studentJSON.setEmail(item.getLastName());
+
+        return studentJSON;
     }
 }

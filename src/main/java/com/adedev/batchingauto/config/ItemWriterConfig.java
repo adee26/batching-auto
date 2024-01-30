@@ -1,6 +1,7 @@
 package com.adedev.batchingauto.config;
 
 import com.adedev.batchingauto.model.StudentJDBC;
+import com.adedev.batchingauto.model.StudentJSON;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor;
@@ -39,9 +40,9 @@ public class ItemWriterConfig {
 
     @Bean
     @StepScope
-    public JsonFileItemWriter<StudentJDBC> jsonFileItemWriter(
+    public JsonFileItemWriter<StudentJSON> jsonFileItemWriter(
             @Value("#{jobParameters['outputFile']}") FileSystemResource fileSystemResource) {
-        JsonFileItemWriter<StudentJDBC> jsonFileItemWriter = new JsonFileItemWriter<>(
+        JsonFileItemWriter<StudentJSON> jsonFileItemWriter = new JsonFileItemWriter<>(
                 fileSystemResource, new JacksonJsonObjectMarshaller<>());
         return jsonFileItemWriter;
     }
