@@ -2,6 +2,7 @@ package com.adedev.batchingauto.config;
 
 import com.adedev.batchingauto.model.StudentCSV;
 import com.adedev.batchingauto.model.StudentJSON;
+import com.adedev.batchingauto.model.StudentXML;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -15,10 +16,12 @@ import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.item.json.JacksonJsonObjectReader;
 import org.springframework.batch.item.json.JsonItemReader;
+import org.springframework.batch.item.xml.StaxEventItemReader;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import java.io.File;
@@ -50,9 +53,10 @@ public class SampleJob {
 
     public Step firstChunkStep() {
         return new StepBuilder("First Chunk Step", jobRepository)
-                .<StudentJSON, StudentJSON> chunk(3, transactionManager)
+                .<StudentXML, StudentXML> chunk(3, transactionManager)
 //                .reader(flatFileItemReader(null))
-                .reader(jsonItemReader(null))
+//                .reader(jsonItemReader(null))
+                .reader(staxEventItemReader(null))
 //                .processor(jobProcessor)
                 .writer(jobWriter)
                 .build();
@@ -93,6 +97,21 @@ public class SampleJob {
         jsonItemReader.setCurrentItemCount(2);
         jsonItemReader.setMaxItemCount(8);
         return jsonItemReader;
+    }
+
+    @Bean
+    @StepScope
+    public StaxEventItemReader<StudentXML> staxEventItemReader(
+            @Value("#{jobParameters['inputFile']}") FileSystemResource fileSystemResource) {
+        StaxEventItemReader<StudentXML> staxEventItemReader = new StaxEventItemReader<>();
+        staxEventItemReader.setResource(fileSystemResource);
+        staxEventItemReader.setFragmentRootElementName("student");
+
+        Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
+        marshaller.setClassesToBeBound(StudentXML.class);
+        staxEventItemReader.setUnmarshaller(marshaller);
+
+        return staxEventItemReader;
     }
 
 }
