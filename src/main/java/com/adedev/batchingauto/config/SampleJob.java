@@ -24,6 +24,7 @@ import org.springframework.batch.item.json.JacksonJsonObjectReader;
 import org.springframework.batch.item.json.JsonFileItemWriter;
 import org.springframework.batch.item.json.JsonItemReader;
 import org.springframework.batch.item.xml.StaxEventItemReader;
+import org.springframework.batch.item.xml.StaxEventItemWriter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -47,11 +48,14 @@ public class SampleJob {
     private final DataSource universityDataSource;
     private final FlatFileItemWriter<StudentJDBC> flatFileItemWriter;
     private final JsonFileItemWriter<StudentJSON> jsonFileItemWriter;
+    private final StaxEventItemWriter<StudentJDBC> staxEventItemWriter;
 
     public SampleJob(JobRepository jobRepository, PlatformTransactionManager transactionManager,
                      FirstJobReader jobReader, FirstJobProcessor jobProcessor, FirstJobWriter jobWriter,
                      StudentService studentService, DataSource universityDataSource,
-                     FlatFileItemWriter<StudentJDBC> flatFileItemWriter, JsonFileItemWriter<StudentJSON> jsonFileItemWriter) {
+                     FlatFileItemWriter<StudentJDBC> flatFileItemWriter,
+                     JsonFileItemWriter<StudentJSON> jsonFileItemWriter,
+                     StaxEventItemWriter<StudentJDBC> staxEventItemWriter) {
         this.jobRepository = jobRepository;
         this.transactionManager = transactionManager;
         this.jobReader = jobReader;
@@ -61,6 +65,7 @@ public class SampleJob {
         this.universityDataSource = universityDataSource;
         this.flatFileItemWriter = flatFileItemWriter;
         this.jsonFileItemWriter = jsonFileItemWriter;
+        this.staxEventItemWriter = staxEventItemWriter;
     }
 
     @Bean
@@ -73,14 +78,14 @@ public class SampleJob {
 
     public Step firstChunkStep() {
         return new StepBuilder("First Chunk Step", jobRepository)
-                .<StudentJDBC, StudentJSON> chunk(3, transactionManager)
+                .<StudentJDBC, StudentJDBC> chunk(3, transactionManager)
 //                .reader(flatFileItemReader(null))
 //                .reader(jsonItemReader(null))
 //                .reader(staxEventItemReader(null))
                 .reader(jdbcJdbcCursorItemReader())
 //                .reader(itemReaderAdapter())
-                .processor(jobProcessor)
-                .writer(jsonFileItemWriter)
+//                .processor(jobProcessor)
+                .writer(staxEventItemWriter)
 //                .writer(jobWriter)
                 .build();
 

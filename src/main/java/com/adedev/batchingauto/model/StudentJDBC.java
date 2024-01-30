@@ -1,5 +1,8 @@
 package com.adedev.batchingauto.model;
 
+import jakarta.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement(name = "student")
 public class StudentJDBC {
     private Long id;
     private String firstName;
