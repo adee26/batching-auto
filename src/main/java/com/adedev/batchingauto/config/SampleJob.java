@@ -21,6 +21,7 @@ import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.item.json.JacksonJsonObjectReader;
+import org.springframework.batch.item.json.JsonFileItemWriter;
 import org.springframework.batch.item.json.JsonItemReader;
 import org.springframework.batch.item.xml.StaxEventItemReader;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -45,9 +46,10 @@ public class SampleJob {
     @Qualifier("universityDataSource")
     private final DataSource universityDataSource;
     private final FlatFileItemWriter<StudentJDBC> flatFileItemWriter;
+    private final JsonFileItemWriter<StudentJDBC> jsonFileItemWriter;
 
     public SampleJob(JobRepository jobRepository, PlatformTransactionManager transactionManager,
-                     FirstJobReader jobReader, FirstJobProcessor jobProcessor, FirstJobWriter jobWriter, StudentService studentService, DataSource universityDataSource, FlatFileItemWriter<StudentJDBC> flatFileItemWriter) {
+                     FirstJobReader jobReader, FirstJobProcessor jobProcessor, FirstJobWriter jobWriter, StudentService studentService, DataSource universityDataSource, FlatFileItemWriter<StudentJDBC> flatFileItemWriter, JsonFileItemWriter<StudentJDBC> jsonFileItemWriter) {
         this.jobRepository = jobRepository;
         this.transactionManager = transactionManager;
         this.jobReader = jobReader;
@@ -56,6 +58,7 @@ public class SampleJob {
         this.studentService = studentService;
         this.universityDataSource = universityDataSource;
         this.flatFileItemWriter = flatFileItemWriter;
+        this.jsonFileItemWriter = jsonFileItemWriter;
     }
 
     @Bean
@@ -75,7 +78,7 @@ public class SampleJob {
                 .reader(jdbcJdbcCursorItemReader())
 //                .reader(itemReaderAdapter())
 //                .processor(jobProcessor)
-                .writer(flatFileItemWriter)
+                .writer(jsonFileItemWriter)
 //                .writer(jobWriter)
                 .build();
 
@@ -142,7 +145,7 @@ public class SampleJob {
         beanPropertyRowMapper.setMappedClass(StudentJDBC.class);
         jdbcJdbcCursorItemReader.setRowMapper(beanPropertyRowMapper);
 
-        jdbcJdbcCursorItemReader.setCurrentItemCount(2);
+//        jdbcJdbcCursorItemReader.setCurrentItemCount(2);
 //        jdbcJdbcCursorItemReader.setMaxItemCount(8);
 
         return jdbcJdbcCursorItemReader;
