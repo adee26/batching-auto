@@ -16,6 +16,7 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.adapter.ItemReaderAdapter;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
@@ -43,9 +44,10 @@ public class SampleJob {
     private final StudentService studentService;
     @Qualifier("universityDataSource")
     private final DataSource universityDataSource;
+    private final FlatFileItemWriter<StudentJDBC> flatFileItemWriter;
 
     public SampleJob(JobRepository jobRepository, PlatformTransactionManager transactionManager,
-                     FirstJobReader jobReader, FirstJobProcessor jobProcessor, FirstJobWriter jobWriter, StudentService studentService, DataSource universityDataSource) {
+                     FirstJobReader jobReader, FirstJobProcessor jobProcessor, FirstJobWriter jobWriter, StudentService studentService, DataSource universityDataSource, FlatFileItemWriter<StudentJDBC> flatFileItemWriter) {
         this.jobRepository = jobRepository;
         this.transactionManager = transactionManager;
         this.jobReader = jobReader;
@@ -53,6 +55,7 @@ public class SampleJob {
         this.jobWriter = jobWriter;
         this.studentService = studentService;
         this.universityDataSource = universityDataSource;
+        this.flatFileItemWriter = flatFileItemWriter;
     }
 
     @Bean
@@ -65,14 +68,15 @@ public class SampleJob {
 
     public Step firstChunkStep() {
         return new StepBuilder("First Chunk Step", jobRepository)
-                .<StudentResponse, StudentResponse> chunk(3, transactionManager)
+                .<StudentJDBC, StudentJDBC> chunk(3, transactionManager)
 //                .reader(flatFileItemReader(null))
 //                .reader(jsonItemReader(null))
 //                .reader(staxEventItemReader(null))
-//                .reader(jdbcJdbcCursorItemReader())
-                .reader(itemReaderAdapter())
+                .reader(jdbcJdbcCursorItemReader())
+//                .reader(itemReaderAdapter())
 //                .processor(jobProcessor)
-                .writer(jobWriter)
+                .writer(flatFileItemWriter)
+//                .writer(jobWriter)
                 .build();
 
     }
