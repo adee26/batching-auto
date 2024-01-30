@@ -1,6 +1,7 @@
 package com.adedev.batchingauto.config;
 
 import com.adedev.batchingauto.model.StudentCSV;
+import com.adedev.batchingauto.model.StudentJDBC;
 import com.adedev.batchingauto.model.StudentJSON;
 import com.adedev.batchingauto.model.StudentXML;
 import org.springframework.batch.core.Job;
@@ -10,6 +11,7 @@ import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
@@ -21,10 +23,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import java.io.File;
+import javax.sql.DataSource;
 
 @Configuration
 public class SampleJob {
@@ -33,14 +36,16 @@ public class SampleJob {
     private final FirstJobReader jobReader;
     private final FirstJobProcessor jobProcessor;
     private final FirstJobWriter jobWriter;
+    private final DataSource dataSource;
 
     public SampleJob(JobRepository jobRepository, PlatformTransactionManager transactionManager,
-                     FirstJobReader jobReader, FirstJobProcessor jobProcessor, FirstJobWriter jobWriter) {
+                     FirstJobReader jobReader, FirstJobProcessor jobProcessor, FirstJobWriter jobWriter, DataSource dataSource) {
         this.jobRepository = jobRepository;
         this.transactionManager = transactionManager;
         this.jobReader = jobReader;
         this.jobProcessor = jobProcessor;
         this.jobWriter = jobWriter;
+        this.dataSource = dataSource;
     }
 
     @Bean
@@ -53,10 +58,11 @@ public class SampleJob {
 
     public Step firstChunkStep() {
         return new StepBuilder("First Chunk Step", jobRepository)
-                .<StudentXML, StudentXML> chunk(3, transactionManager)
+                .<StudentJDBC, StudentJDBC> chunk(3, transactionManager)
 //                .reader(flatFileItemReader(null))
 //                .reader(jsonItemReader(null))
-                .reader(staxEventItemReader(null))
+//                .reader(staxEventItemReader(null))
+                .reader(jdbcJdbcCursorItemReader())
 //                .processor(jobProcessor)
                 .writer(jobWriter)
                 .build();
@@ -112,6 +118,22 @@ public class SampleJob {
         staxEventItemReader.setUnmarshaller(marshaller);
 
         return staxEventItemReader;
+    }
+
+    public JdbcCursorItemReader<StudentJDBC> jdbcJdbcCursorItemReader() {
+        JdbcCursorItemReader<StudentJDBC> jdbcJdbcCursorItemReader = new JdbcCursorItemReader<>();
+        jdbcJdbcCursorItemReader.setDataSource(dataSource);
+        jdbcJdbcCursorItemReader.setSql(
+                "SELECT id, first_name, last_name, email FROM student");
+
+        BeanPropertyRowMapper<StudentJDBC> beanPropertyRowMapper = new BeanPropertyRowMapper<>();
+        beanPropertyRowMapper.setMappedClass(StudentJDBC.class);
+        jdbcJdbcCursorItemReader.setRowMapper(beanPropertyRowMapper);
+
+        jdbcJdbcCursorItemReader.setCurrentItemCount(2);
+        jdbcJdbcCursorItemReader.setMaxItemCount(8);
+
+        return jdbcJdbcCursorItemReader;
     }
 
 }
