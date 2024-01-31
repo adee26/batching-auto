@@ -7,8 +7,8 @@ import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.orm.jpa.LocalEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 
 import javax.sql.DataSource;
@@ -47,7 +47,8 @@ public class DatasourceConfig {
         return lem.getObject();
     }
 
-    @Bean
+    @Bean(name = "entityManagerFactory")
+    @Primary
     public EntityManagerFactory mysqlEntityManagerFactory() {
         LocalContainerEntityManagerFactoryBean lem = new LocalContainerEntityManagerFactoryBean();
         lem.setDataSource(universityDataSource());
@@ -57,5 +58,14 @@ public class DatasourceConfig {
         lem.afterPropertiesSet();
 
         return lem.getObject();
+    }
+
+    @Bean
+    @Primary
+    public JpaTransactionManager jpaTransactionManager() {
+        JpaTransactionManager jpaTransactionManager = new JpaTransactionManager();
+        jpaTransactionManager.setDataSource(universityDataSource());
+        jpaTransactionManager.setEntityManagerFactory(mysqlEntityManagerFactory());
+        return jpaTransactionManager;
     }
 }
