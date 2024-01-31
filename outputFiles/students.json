@@ -1,10 +1,9 @@
 [
- {"id":1,"firstName":"Cyndie","lastName":"Boddam","email":"cboddam0@tumblr.com"},
- {"id":2,"firstName":"Percival","lastName":"Yanez","email":"pyanez1@freewebs.com"},
- {"id":3,"firstName":"Urban","lastName":"Searchwell","email":"usearchwell2@shareasale.com"},
- {"id":4,"firstName":"Elwood","lastName":"Chalk","email":"echalk3@ucoz.ru"},
- {"id":5,"firstName":"Andonis","lastName":"Trazzi","email":"atrazzi4@miitbeian.gov.cn"},
- {"id":6,"firstName":"Eula","lastName":"Little","email":"elittle5@hatena.ne.jp"},
- {"id":9,"firstName":"Amalita","lastName":"Skirling","email":"askirling8@ovh.net"},
- {"id":10,"firstName":"Marianna","lastName":"Niccolls","email":"mniccolls9@bizjournals.com"}
+ {"id":1,"firstName":"Cyndie","lastName":"Boddam","email":"Boddam"},
+ {"id":2,"firstName":"Percival","lastName":"Yanez","email":"Yanez"},
+ {"id":3,"firstName":"Urban","lastName":"Searchwell","email":"Searchwell"},
+ {"id":4,"firstName":"Elwood","lastName":"Chalk","email":"Chalk"},
+ {"id":5,"firstName":"Andonis","lastName":"Trazzi","email":"Trazzi"},
+ {"id":9,"firstName":"Amalita","lastName":"Skirling","email":"Skirling"},
+ {"id":10,"firstName":"Marianna","lastName":"Niccolls","email":"Niccolls"}
 ]
