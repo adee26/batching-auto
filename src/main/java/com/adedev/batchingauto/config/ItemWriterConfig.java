@@ -6,6 +6,7 @@ import com.adedev.batchingauto.model.StudentJSON;
 import com.adedev.batchingauto.model.StudentResponse;
 import com.adedev.batchingauto.service.StudentService;
 import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.adapter.ItemWriterAdapter;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.file.FlatFileItemWriter;

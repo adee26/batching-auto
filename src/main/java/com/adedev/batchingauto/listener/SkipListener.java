@@ -1,8 +1,10 @@
 package com.adedev.batchingauto.listener;
 
 import com.adedev.batchingauto.model.StudentCSV;
+import com.adedev.batchingauto.model.StudentJSON;
 import org.springframework.batch.core.annotation.OnSkipInProcess;
 import org.springframework.batch.core.annotation.OnSkipInRead;
+import org.springframework.batch.core.annotation.OnSkipInWrite;
 import org.springframework.batch.item.file.FlatFileParseException;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +25,11 @@ public class SkipListener {
     @OnSkipInProcess
     public void skipInProcess(StudentCSV studentCSV, Throwable th) {
         createFile("firstChunkStep/processor/SkipInProcess.txt", studentCSV.toString());
+    }
+
+    @OnSkipInWrite
+    public void skipInWrite(StudentJSON studentJSON, Throwable th) {
+        createFile("firstChunkStep/writer/SkipInWrite.txt", studentJSON.toString());
     }
 
     public void createFile(String filePath, String data) {
