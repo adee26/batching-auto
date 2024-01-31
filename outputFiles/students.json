@@ -1,9 +1,5 @@
 [
  {"id":1,"firstName":"Cyndie","lastName":"Boddam","email":"Boddam"},
  {"id":2,"firstName":"Percival","lastName":"Yanez","email":"Yanez"},
- {"id":3,"firstName":"Urban","lastName":"Searchwell","email":"Searchwell"},
- {"id":4,"firstName":"Elwood","lastName":"Chalk","email":"Chalk"},
- {"id":5,"firstName":"Andonis","lastName":"Trazzi","email":"Trazzi"},
- {"id":9,"firstName":"Amalita","lastName":"Skirling","email":"Skirling"},
- {"id":10,"firstName":"Marianna","lastName":"Niccolls","email":"Niccolls"}
+ {"id":3,"firstName":"Urban","lastName":"Searchwell","email":"Searchwell"}
 ]

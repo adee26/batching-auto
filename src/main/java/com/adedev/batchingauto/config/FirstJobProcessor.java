@@ -13,6 +13,7 @@ public class FirstJobProcessor implements ItemProcessor<StudentCSV, StudentJSON>
         System.out.println("Inside Item Processor");
 
         if(item.getId() == 6) {
+            System.out.println("Inside JsonFileItemProcessor");
             throw new NullPointerException();
         }
 

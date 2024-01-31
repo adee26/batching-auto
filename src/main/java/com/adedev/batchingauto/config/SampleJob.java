@@ -104,9 +104,11 @@ public class SampleJob {
                 .writer(jsonFileItemWriter)
                 .faultTolerant()
                 .skip(FlatFileParseException.class)
-                .skipLimit(Integer.MAX_VALUE)
-                .skipPolicy(new AlwaysSkipItemSkipPolicy())
+//                .skipLimit(Integer.MAX_VALUE)
+//                .skipPolicy(new AlwaysSkipItemSkipPolicy())
                 .listener(skipListener)
+                .retryLimit(2)
+                .retry(Throwable.class)
 //                .writer(jobWriter)
                 .build();
 
