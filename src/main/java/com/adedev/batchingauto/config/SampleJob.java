@@ -7,6 +7,7 @@ import com.adedev.batchingauto.model.StudentJSON;
 import com.adedev.batchingauto.model.StudentResponse;
 import com.adedev.batchingauto.model.StudentXML;
 import com.adedev.batchingauto.service.StudentService;
+import jakarta.persistence.EntityManagerFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -59,6 +60,10 @@ public class SampleJob {
     private final ItemWriterAdapter<StudentCSV> itemWriterAdapter;
 //    private final SkipListener skipListener;
     private final SkipListenerImpl skipListener;
+    @Qualifier("postgresqlEntityManagerFactory")
+    private final EntityManagerFactory postgreSqlEntityManagerFactory;
+    @Qualifier("mysqlEntityManagerFactory")
+    private final EntityManagerFactory mysqlEntityManagerFactory;
 
     public SampleJob(JobRepository jobRepository, PlatformTransactionManager transactionManager,
                      FirstJobReader jobReader, FirstJobProcessor jobProcessor, FirstJobWriter jobWriter,
@@ -68,7 +73,9 @@ public class SampleJob {
                      StaxEventItemWriter<StudentJDBC> staxEventItemWriter,
                      JdbcBatchItemWriter<StudentCSV> jdbcBatchItemWriter,
                      ItemWriterAdapter<StudentCSV> itemWriterAdapter,
-                     SkipListenerImpl skipListener) {
+                     SkipListenerImpl skipListener,
+                     EntityManagerFactory postgreSqlEntityManagerFactory,
+                     EntityManagerFactory mysqlEntityManagerFactory) {
         this.jobRepository = jobRepository;
         this.transactionManager = transactionManager;
         this.jobReader = jobReader;
@@ -83,6 +90,8 @@ public class SampleJob {
         this.jdbcBatchItemWriter = jdbcBatchItemWriter;
         this.itemWriterAdapter = itemWriterAdapter;
         this.skipListener = skipListener;
+        this.postgreSqlEntityManagerFactory = postgreSqlEntityManagerFactory;
+        this.mysqlEntityManagerFactory = mysqlEntityManagerFactory;
     }
 
     @Bean
