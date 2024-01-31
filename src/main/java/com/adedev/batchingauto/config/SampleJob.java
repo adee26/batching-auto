@@ -1,6 +1,5 @@
 package com.adedev.batchingauto.config;
 
-import com.adedev.batchingauto.listener.SkipListener;
 import com.adedev.batchingauto.listener.SkipListenerImpl;
 import com.adedev.batchingauto.model.StudentCSV;
 import com.adedev.batchingauto.model.StudentJDBC;
@@ -15,7 +14,6 @@ import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.core.step.skip.AlwaysSkipItemSkipPolicy;
 import org.springframework.batch.item.adapter.ItemReaderAdapter;
 import org.springframework.batch.item.adapter.ItemWriterAdapter;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
@@ -52,6 +50,8 @@ public class SampleJob {
     private final StudentService studentService;
     @Qualifier("universityDataSource")
     private final DataSource universityDataSource;
+    @Qualifier("postgresDataSource")
+    private final DataSource postgresDataSource;
     private final FlatFileItemWriter<StudentJDBC> flatFileItemWriter;
     private final JsonFileItemWriter<StudentJSON> jsonFileItemWriter;
     private final StaxEventItemWriter<StudentJDBC> staxEventItemWriter;
@@ -63,7 +63,7 @@ public class SampleJob {
     public SampleJob(JobRepository jobRepository, PlatformTransactionManager transactionManager,
                      FirstJobReader jobReader, FirstJobProcessor jobProcessor, FirstJobWriter jobWriter,
                      StudentService studentService, DataSource universityDataSource,
-                     FlatFileItemWriter<StudentJDBC> flatFileItemWriter,
+                     DataSource postgresDataSource, FlatFileItemWriter<StudentJDBC> flatFileItemWriter,
                      JsonFileItemWriter<StudentJSON> jsonFileItemWriter,
                      StaxEventItemWriter<StudentJDBC> staxEventItemWriter,
                      JdbcBatchItemWriter<StudentCSV> jdbcBatchItemWriter,
@@ -76,6 +76,7 @@ public class SampleJob {
         this.jobWriter = jobWriter;
         this.studentService = studentService;
         this.universityDataSource = universityDataSource;
+        this.postgresDataSource = postgresDataSource;
         this.flatFileItemWriter = flatFileItemWriter;
         this.jsonFileItemWriter = jsonFileItemWriter;
         this.staxEventItemWriter = staxEventItemWriter;

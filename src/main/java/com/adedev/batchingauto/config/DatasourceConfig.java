@@ -23,4 +23,10 @@ public class DatasourceConfig {
     public DataSource universityDataSource() {
         return DataSourceBuilder.create().build();
     }
+
+    @Bean
+    @ConfigurationProperties(prefix = "spring.postgres-datasource")
+    public DataSource postgresDataSource() {
+        return DataSourceBuilder.create().build();
+    }
 }
