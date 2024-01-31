@@ -1,5 +1,6 @@
 package com.adedev.batchingauto.config;
 
+import com.adedev.batchingauto.listener.SkipListener;
 import com.adedev.batchingauto.model.StudentCSV;
 import com.adedev.batchingauto.model.StudentJDBC;
 import com.adedev.batchingauto.model.StudentJSON;
@@ -55,6 +56,7 @@ public class SampleJob {
     private final StaxEventItemWriter<StudentJDBC> staxEventItemWriter;
     private final JdbcBatchItemWriter<StudentCSV> jdbcBatchItemWriter;
     private final ItemWriterAdapter<StudentCSV> itemWriterAdapter;
+    private final SkipListener skipListener;
 
     public SampleJob(JobRepository jobRepository, PlatformTransactionManager transactionManager,
                      FirstJobReader jobReader, FirstJobProcessor jobProcessor, FirstJobWriter jobWriter,
@@ -62,7 +64,9 @@ public class SampleJob {
                      FlatFileItemWriter<StudentJDBC> flatFileItemWriter,
                      JsonFileItemWriter<StudentJSON> jsonFileItemWriter,
                      StaxEventItemWriter<StudentJDBC> staxEventItemWriter,
-                     JdbcBatchItemWriter<StudentCSV> jdbcBatchItemWriter, ItemWriterAdapter<StudentCSV> itemWriterAdapter) {
+                     JdbcBatchItemWriter<StudentCSV> jdbcBatchItemWriter,
+                     ItemWriterAdapter<StudentCSV> itemWriterAdapter,
+                     SkipListener skipListener) {
         this.jobRepository = jobRepository;
         this.transactionManager = transactionManager;
         this.jobReader = jobReader;
@@ -75,6 +79,7 @@ public class SampleJob {
         this.staxEventItemWriter = staxEventItemWriter;
         this.jdbcBatchItemWriter = jdbcBatchItemWriter;
         this.itemWriterAdapter = itemWriterAdapter;
+        this.skipListener = skipListener;
     }
 
     @Bean
@@ -99,6 +104,7 @@ public class SampleJob {
                 .skip(FlatFileParseException.class)
 //                .skipLimit(Integer.MAX_VALUE)
                 .skipPolicy(new AlwaysSkipItemSkipPolicy())
+                .listener(skipListener)
 //                .writer(jobWriter)
                 .build();
 
