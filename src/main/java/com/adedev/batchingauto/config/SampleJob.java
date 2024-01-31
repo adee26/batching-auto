@@ -13,12 +13,14 @@ import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.core.step.skip.AlwaysSkipItemSkipPolicy;
 import org.springframework.batch.item.adapter.ItemReaderAdapter;
 import org.springframework.batch.item.adapter.ItemWriterAdapter;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.FlatFileItemWriter;
+import org.springframework.batch.item.file.FlatFileParseException;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
@@ -85,14 +87,18 @@ public class SampleJob {
 
     public Step firstChunkStep() {
         return new StepBuilder("First Chunk Step", jobRepository)
-                .<StudentCSV, StudentCSV> chunk(3, transactionManager)
+                .<StudentCSV, StudentJSON> chunk(3, transactionManager)
                 .reader(flatFileItemReader(null))
 //                .reader(jsonItemReader(null))
 //                .reader(staxEventItemReader(null))
 //                .reader(jdbcJdbcCursorItemReader())
 //                .reader(itemReaderAdapter())
 //                .processor(jobProcessor)
-                .writer(itemWriterAdapter)
+                .writer(jsonFileItemWriter)
+                .faultTolerant()
+                .skip(FlatFileParseException.class)
+//                .skipLimit(Integer.MAX_VALUE)
+                .skipPolicy(new AlwaysSkipItemSkipPolicy())
 //                .writer(jobWriter)
                 .build();
 
